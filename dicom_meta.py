@@ -34,6 +34,7 @@ FIELDS = [
     'ImagedNucleus',
     'ImagingFrequency',
     'InPlanePhaseEncodingDirection',
+    'InP'
     'InStackPositionNumber',
     'InstanceNumber',
     'InversionTime',

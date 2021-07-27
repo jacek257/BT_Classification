@@ -9,7 +9,7 @@ def get_dir_dict(train_dir):
     patients = [train_dir + p for p in next(os.walk(train_dir))[1]]
     images = {
         "flair" : [p + "/FLAIR" for p in patients],
-        "t1": [p + "/T1w" for p in patients],
+        "t1w": [p + "/T1w" for p in patients],
         "t1wce": [p + "/T1wCE" for p in patients],
         "t2w": [p + "/T2w" for p in patients]
     }
@@ -115,8 +115,8 @@ def process_image(series, resample_spacing=None):
     image = read_dicom_series(series)
     image = rotate_image(image)
 #     comment for testing
-#     image = resample_image(image, resample_spacing=resample_spacing)
-#     image = n4_bias_correction(image)
+    image = resample_image(image, resample_spacing=resample_spacing)
+    image = n4_bias_correction(image)
     image = sitk.RescaleIntensity(image, 0, 1)
     
     return image 

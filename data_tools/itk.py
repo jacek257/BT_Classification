@@ -3,6 +3,8 @@ import pandas as pd
 import sys
 import os
 import SimpleITK as sitk
+import numpy as np
+import matplotlib.pyplot as plt
 sitk.ProcessObject_SetGlobalWarningDisplay(False)
 
 def get_dir_dict(train_dir):
@@ -18,6 +20,25 @@ def get_dir_dict(train_dir):
 def safe_make_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
+def show_image(im):
+    fig, axs = plt.subplots(1,3)
+    arr = sitk.GetArrayFromImage(im)
+    imax = np.max(arr)
+
+    axs[0].imshow(
+        arr[arr.shape[0]//2,:,:],
+        aspect='auto', vmax=imax, origin='lower')
+    axs[0].set_title("normal 0")
+    axs[1].imshow(
+        arr[:,arr.shape[1]//2,:],
+        aspect='auto', vmax=imax, origin='lower')
+    axs[1].set_title("normal 1")
+    axs[2].imshow(
+        arr[:,:,arr.shape[2]//2],
+        aspect='auto', vmax=imax, origin='lower')
+    axs[2].set_title("normal 2")
+    fig.show()
 
 def read_dicom_series(path):
     """
@@ -44,9 +65,9 @@ def resample_image(image, resample_spacing=None):
         
         # calculate post voxel size and
         post_is = [
-            int(np.round(pre_is[0] * (pre_vs[0] / 2))),
-            int(np.round(pre_is[1] * (pre_vs[1] / 2))),
-            int(np.round(pre_is[2] * (pre_vs[2] / 2))) 
+            int(np.round(pre_is[0] * (pre_vs[0] / resample_spacing[0]))),
+            int(np.round(pre_is[1] * (pre_vs[1] / resample_spacing[1]))),
+            int(np.round(pre_is[2] * (pre_vs[2] / resample_spacing[2]))) 
         ]
         
         return sitk.Resample(
@@ -113,9 +134,9 @@ def process_image(series, resample_spacing=None):
     # read series -> rotate image -> resample image -> n4 bias correction
     # -> intensity normalization 
     image = read_dicom_series(series)
+    image = resample_image(image, resample_spacing=resample_spacing)
     image = rotate_image(image)
 #     comment for testing
-    image = resample_image(image, resample_spacing=resample_spacing)
     image = n4_bias_correction(image)
     image = sitk.RescaleIntensity(image, 0, 1)
     
@@ -133,6 +154,8 @@ def map_safe_process(input_tuple):
             
             # process and write
             image = process_image(series, resample_spacing)
+            arr = sitk.GetArrayFromImage(image)
+#             np.save(out_file, arr)
             sitk.WriteImage(image, out_file)
             
         except:

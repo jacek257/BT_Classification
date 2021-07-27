@@ -12,7 +12,6 @@ if __name__ == "__main__":
         num_processes = int(sys.argv[1])
     else:
         num_processes = os.cpu_count() - 1
-    if len(sys.arg)
     
         
     print(f"Preprocess using: {num_processes} cores")
@@ -45,26 +44,26 @@ if __name__ == "__main__":
            for f in IMAGE_DIRS["t2w"]]
     
     # testing mods (REMOVE-START)
-    flair = random.sample(flair, 10)
-    gobble = [f[0] for f in flair]
-    for g in gobble:
-        print(g)
+#     flair = random.sample(flair, 10)
+#     gobble = [f[0] for f in flair]
+#     for g in gobble:
+#         print(g)
     # REMOVE-END
 
     # process flair
     with Pool(num_processes) as p:
         list(tqdm(p.imap(map_safe_process, flair), total=len(flair),
-                 desc="flair"))
-   # process t1w    
+            desc="flair"))
+    # process t1w    
     with Pool(num_processes) as p: 
         list(tqdm(p.imap(map_safe_process, t1w), total=len(flair),
-                 desc="t1w  "))
+            desc="t1w  "))
     # process t1wce    
     with Pool(num_processes) as p:
         list(tqdm(p.imap(map_safe_process, t1wce), total=len(flair),
-                 desc="t1wce"))
-   # process t2w
-   with Pool(num_processes) as p:
+            desc="t1wce"))
+    # process t2w
+    with Pool(num_processes) as p:
         list(tqdm(p.imap(map_safe_process, t2w), total=len(flair),
-                 desc="t2w. "))
+            desc="t2w. "))
  

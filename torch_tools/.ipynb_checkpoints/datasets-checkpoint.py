@@ -21,10 +21,8 @@ def get_data_paths(data_dir):
 # get data by indexing: foo[[1,2,3]] or foo[8] 
 # returns [ [imglist],  [labellist] ] 
 class flair_dataset(Dataset):
-    def __init__(self, data_dir, transform=None):
-        self.table_path = data_dir
-        self.paths,_,_,_,self.labels = get_data_paths(data_dir)
-        
+    def __init__(self, data_table, transform=None):
+        self.paths, self.labels = data_table
         self.transform=transform
         
     def __len__(self):
@@ -36,9 +34,9 @@ class flair_dataset(Dataset):
         
         # get list if multiple indeces are passed
         if isinstance(item, list):
-            result = [[sitk.GetArrayFromImage(sitk.ReadImage(self.paths[i]))] for i in item]
+            result = [sitk.GetArrayFromImage(sitk.ReadImage(self.paths[i])) for i in item]
         else:
-            result = [[sitk.GetArrayFromImage(sitk.ReadImage(self.paths[item]))]]
+            result = [sitk.GetArrayFromImage(sitk.ReadImage(self.paths[item]))]
         
         # convert to tensor to support batch transforms
         result = torch.FloatTensor(result)
@@ -46,6 +44,6 @@ class flair_dataset(Dataset):
         if self.transform is not None:
             result = self.transform(result)
             
-        return result, self.labels[item], self.paths[item]
+        return result, self.labels[item]
         
         

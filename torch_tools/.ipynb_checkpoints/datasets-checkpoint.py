@@ -4,6 +4,7 @@ from torch.utils.data import Dataset
 import numpy as np
 import os
 import SimpleITK as sitk
+import PIL as Image
 
 def get_data_paths(data_dir):
     # load each type individually
@@ -32,11 +33,15 @@ class flair_dataset(Dataset):
     def __getitem__(self, item):
         if torch.is_tensor(item):
             item = item.tolist()
-            
+        
+        # get list if multiple indeces are passed
         if isinstance(item, list):
-            result = [sitk.GetArrayFromImage(sitk.ReadImage(self.paths[i])) for i in item]
+            result = [[sitk.GetArrayFromImage(sitk.ReadImage(self.paths[i]))] for i in item]
         else:
-            result = [sitk.GetArrayFromImage(sitk.ReadImage(self.paths[item]))]
+            result = [[sitk.GetArrayFromImage(sitk.ReadImage(self.paths[item]))]]
+        
+        # convert to tensor to support batch transforms
+        result = torch.FloatTensor(result)
             
         if self.transform is not None:
             result = self.transform(result)

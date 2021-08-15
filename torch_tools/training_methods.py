@@ -48,7 +48,8 @@ def evaluate_model(model, loader, criterion, device, pbar=None):
             outputs = model(inputs)
 
             # get acc and error
-            _, predictions = torch.max(outputs, 1)
+            predictions = torch.round(outputs)
+            # TODO: do binary prediction calculations right here
             eval_acc += torch.sum(predictions == labels)
             loss = criterion(outputs, labels)
             eval_loss += loss.item()
